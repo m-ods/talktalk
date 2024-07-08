@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BROADCAST_URL = "memory://"
+BROADCAST_URL = os.getenv('BROADCAST_URL', "memory://")
 
 broadcast = Broadcast(BROADCAST_URL)
 templates = Jinja2Templates("templates")
