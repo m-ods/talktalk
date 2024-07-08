@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'></script>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
+  <script> var wsUrl = "{{ url_for('chatroom_ws') }}"</script>
+  <script src="{{ url_for('static', path='index.js') }}"></script>
+</head>
+<body>
+  <div id="error" class="bordered" style="display: none;">
+    This browser has no native WebSocket support.<br/>
+    Use a WebKit nightly or Google Chrome.
+  </div>
+  <div id="ask" class="bordered">
+    Name: <input type="text" id="name" /> <a href="#"><span class="join">Join!</span></a>
+  </div>
+  <div id="channel" class="bordered" style="display: none;">
+    <div id="descr" class="bordered">
+      <strong>Tip:</strong> Open up another browser window to chat.
+    </div>
+    <div id="msgs">
+      <ul>
+        <li class="message" style="display: none">
+          <span class="user"></span><span class="message"></span>
+          <span class="time"></span>
+        </li>
+      </ul>
+    </div>
+    <div id="input">
+      <form><input type="text" id="message" /></form>
+    </div>
+  </div>
+</body>
+</html>
