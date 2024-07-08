@@ -14,7 +14,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 BROADCAST_URL = "memory://"
 
 broadcast = Broadcast(BROADCAST_URL)
