@@ -19,6 +19,7 @@ broadcast = Broadcast(BROADCAST_URL)
 templates = Jinja2Templates("templates")
 
 transcribers = {}
+connected_clients = []
 
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 
@@ -31,6 +32,8 @@ async def homepage(request):
 async def chatroom_ws(websocket):
     await websocket.accept()
     name = websocket.query_params.get('name', 'Guest')
+
+    connected_clients.append(websocket)
 
     async with anyio.create_task_group() as task_group:
         transcribers[name] = {
@@ -45,6 +48,8 @@ async def chatroom_ws(websocket):
 
         task_group.start_soon(run_chatroom_ws_receiver)
         await chatroom_ws_sender(websocket)
+
+    connected_clients.remove(websocket)
 
 
 async def chatroom_ws_receiver(websocket, name):
@@ -77,7 +82,7 @@ async def chatroom_ws_receiver(websocket, name):
 
                         # Increment the counter for each new final message
                         if is_final or current_message_id is None:
-                            current_message_id = transcribers[name]['message_counter']
+                            current_message_id = f"{name}-{transcribers[name]['message_counter']}"
 
                         response = {
                             "user": name,
@@ -85,12 +90,11 @@ async def chatroom_ws_receiver(websocket, name):
                             "message_id": current_message_id,
                             "final": is_final
                         }
-                        await websocket.send_text(json.dumps(response))
+                        await broadcast_message(response)
 
                         if is_final:
                             transcribers[name]['message_counter'] += 1
                             current_message_id = None  # Reset for the next new message
-
 
             await asyncio.gather(send(), receive())
     except Exception as e:
@@ -102,6 +106,12 @@ async def chatroom_ws_sender(websocket):
         async for event in subscriber:
             data = json.loads(event.message)
             await websocket.send_text(json.dumps(data))
+
+
+async def broadcast_message(message):
+    data = json.dumps(message)
+    for client in connected_clients:
+        await client.send_text(data)
 
 
 routes = [
