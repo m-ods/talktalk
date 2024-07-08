@@ -9,7 +9,6 @@ from starlette.routing import Route, WebSocketRoute, Mount
 from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from broadcaster import Broadcast
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
