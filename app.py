@@ -79,7 +79,6 @@ async def chatroom_ws_receiver(websocket, name):
 
                         # Increment the counter for each new final message
                         if is_final or current_message_id is None:
-                            transcribers[name]['message_counter'] += 1
                             current_message_id = transcribers[name]['message_counter']
 
                         response = {
@@ -91,7 +90,9 @@ async def chatroom_ws_receiver(websocket, name):
                         await websocket.send_text(json.dumps(response))
 
                         if is_final:
+                            transcribers[name]['message_counter'] += 1
                             current_message_id = None  # Reset for the next new message
+
 
             await asyncio.gather(send(), receive())
     except Exception as e:
